@@ -21,12 +21,12 @@ public:
     
     virtual void draw(cocos2d::Renderer *renderer, const cocos2d::Mat4 &transform, uint32_t flags);
 	Animate* setCoinAnimation(int, char*);
-	Animate* setMarioAnimation(int, char*);
+	Animate* setJellyAnimation(int, char*);
     void tick(float dt);
 	void onKeyPressed(EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
-	CREATE_FUNC(HelloWorld);
 	Animate* coinAnimate;
 	Animate* marioAnimate;
+	CREATE_FUNC(HelloWorld);
     
 private:
     b2World* _world;

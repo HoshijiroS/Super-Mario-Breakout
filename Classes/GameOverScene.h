@@ -1,10 +1,3 @@
-//
-//  GameOverScene.h
-//
-//  Created by Joseph Wezorek on 8/11/14.
-//
-//
-
 #ifndef spline_GameOverScene_h
 #define spline_GameOverScene_h
 

@@ -1,10 +1,3 @@
-//
-//  GameOverScene.cpp
-//
-//  Created by Joseph Wezorek on 8/11/14.
-//
-//
-
 #include "GameOverScene.h"
 #include "HelloWorldScene.h"
 

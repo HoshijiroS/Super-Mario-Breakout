@@ -3,7 +3,7 @@
 
 USING_NS_CC;
 
-static cocos2d::Size designResolutionSize = cocos2d::Size(320, 448);
+static cocos2d::Size designResolutionSize = cocos2d::Size(336, 448);
 
 void AppDelegate::initMultiResolution()
 {

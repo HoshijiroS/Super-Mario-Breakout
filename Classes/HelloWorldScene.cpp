@@ -3,7 +3,7 @@
 using namespace cocos2d;
 using namespace CocosDenshion;
 
-#define PTM_RATIO 30
+#define PTM_RATIO 25
 
 HelloWorld::~HelloWorld()
 {
@@ -36,7 +36,6 @@ bool HelloWorld::init() {
 	auto eventListener = EventListenerKeyboard::create();
 	
 	listener->onKeyPressed = CC_CALLBACK_2(HelloWorld::onKeyPressed, this);
-	//listener->onMouseDown = CC_CALLBACK_1(HelloWorld::onMouseMoved, this);
 	
 	this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
     
@@ -83,7 +82,7 @@ bool HelloWorld::init() {
     
     // Create sprite and add it to the layer
 	Sprite *ball = Sprite::create("jellyfish/0001.png");
-	this->marioAnimate = setMarioAnimation(2, "jellyfish/%04d.png");
+	this->marioAnimate = setJellyAnimation(2, "jellyfish/%04d.png");
     ball->setPosition(100, 100);
     ball->setTag(1);
     this->addChild(ball);
@@ -105,7 +104,7 @@ bool HelloWorld::init() {
     b2FixtureDef ballShapeDef;
     ballShapeDef.shape = &circle;
     ballShapeDef.density = 1.0f;
-    ballShapeDef.friction = 0.f;
+    ballShapeDef.friction = 0.0f;
     ballShapeDef.restitution = 1.0f;
     _ballFixture = ballBody->CreateFixture(&ballShapeDef);
     
@@ -160,20 +159,20 @@ bool HelloWorld::init() {
     _world->SetContactListener(_contactListener);
     
 	int counter = 0;
-	int yOffset = 330;
+	int yOffset = 300;
 	int xOffset = 0;
 
-	for(int i = 0; i < 5; i++) {
-		xOffset = 0;
+	for(int i = 0; i < 3; i++) {
+		xOffset = 25;
 		for (int j = 0; j < 10; j++) {
-			static int padding = 20;
+			static int padding = 0;
 
 			// Create block and add it to the layer
-			this->coinAnimate = setCoinAnimation(4, "coin/%04d.png");
 			Sprite* block = Sprite::create("coin/0001.png");
+			this->coinAnimate = setCoinAnimation(4, "coin/%04d.png");
 			//int xOffset = padding+block->getContentSize().width/2+
 			//((block->getContentSize().width+padding)*i);
-			xOffset = xOffset + 30;
+			xOffset = xOffset + 25;
 
 			block->setPosition(xOffset, yOffset);
 			//block->setPosition(xOffset, 250);
@@ -183,8 +182,8 @@ bool HelloWorld::init() {
 
 			// Create block body
 			b2BodyDef blockBodyDef;
-			blockBodyDef.type = b2_dynamicBody;
-			blockBodyDef.position.Set(xOffset / PTM_RATIO, yOffset / PTM_RATIO);
+			blockBodyDef.type = b2_staticBody;
+			blockBodyDef.position.Set(xOffset / PTM_RATIO + 0.2, yOffset / PTM_RATIO);
 			blockBodyDef.userData = block;
 			b2Body *blockBody = _world->CreateBody(&blockBodyDef);
 
@@ -196,17 +195,16 @@ bool HelloWorld::init() {
 			// Create shape definition and add to body
 			b2FixtureDef blockShapeDef;
 			blockShapeDef.shape = &blockShape;
-			blockShapeDef.density = 10.0;
-			blockShapeDef.friction = 0.0;
+			blockShapeDef.density = 10.0f;
+			blockShapeDef.friction = 0.4f;
 			blockShapeDef.restitution = 0.1f;
+			//blockShapeDef.isSensor = true;
 			blockBody->CreateFixture(&blockShapeDef);
 		}
-		yOffset = yOffset - 30;
+		yOffset = yOffset - 25;
     }
     
     //SimpleAudioEngine::getInstance()->playBackgroundMusic("background-music-aac.caf");
-
-	//_mouseJoint->SetTarget(locationWorld);
     
 	this->schedule(schedule_selector(HelloWorld::tick));
 
@@ -248,7 +246,7 @@ void HelloWorld::tick(float dt)
                 b2Vec2 velocity = b->GetLinearVelocity();
                 float32 speed = velocity.Length();
                 
-                if (speed > maxSpeed) {
+				if (speed > maxSpeed) {
                     b->SetLinearDamping(0.5);
                 } else if (speed < maxSpeed) {
                     b->SetLinearDamping(0.0);
@@ -321,31 +319,6 @@ void HelloWorld::tick(float dt)
     }
 }
 
-/*
-void HelloWorld::onTouchesBegan(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event *unused_event)
-{
-    if (_mouseJoint != NULL)
-        return;
-    
-    Touch* myTouch = (!touches.empty()) ? touches[0] : nullptr;
-    Point location = myTouch->getLocationInView();
-    location = CCDirector::getInstance()->convertToGL(location);
-    b2Vec2 locationWorld = b2Vec2(location.x/PTM_RATIO, location.y/PTM_RATIO);
-    
-    if (_paddleFixture->TestPoint(locationWorld)) {
-        b2MouseJointDef md;
-        md.bodyA = _groundBody;
-        md.bodyB = _paddleBody;
-        md.target = locationWorld;
-        md.collideConnected = true;
-        md.maxForce = 1000.0f * _paddleBody->GetMass();
-        
-        _mouseJoint = (b2MouseJoint *)_world->CreateJoint(&md);
-        _paddleBody->SetAwake(true);
-    }
-}*/
-
-
 void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
 	if (_mouseJoint == NULL) 
 		return;
@@ -362,14 +335,6 @@ void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, cocos2d::Event* ev
 			_mouseJoint->SetTarget(locationWorld);
 			break;
 		}
-
-	/*
-	EventMouse* mouseEvent = dynamic_cast<EventMouse*>(event);
-	mouseEvent->getMouseButton();
-	Point location = mouseEvent->getLocationInView();
-	location = CCDirector::getInstance()->convertToGL(location);
-	b2Vec2 locationWorld = b2Vec2(location.x / PTM_RATIO, location.y / PTM_RATIO);
-	//CCLOG("Hey");*/
 }
 
 Animate* HelloWorld::setCoinAnimation(int j, char* filename) {
@@ -382,10 +347,10 @@ Animate* HelloWorld::setCoinAnimation(int j, char* filename) {
 		coinFrames.pushBack(frame);
 	}
 
-	return Animate::create(Animation::createWithSpriteFrames(coinFrames, 0.09f));
+	return Animate::create(Animation::createWithSpriteFrames(coinFrames, 0.05f));
 }
 
-Animate* HelloWorld::setMarioAnimation(int j, char* filename) {
+Animate* HelloWorld::setJellyAnimation(int j, char* filename) {
 	Vector<SpriteFrame*> coinFrames;
 	char str[100];
 	for (int i = 1; i <= j; i++) //Iterate for the number of images you have
@@ -397,45 +362,3 @@ Animate* HelloWorld::setMarioAnimation(int j, char* filename) {
 
 	return Animate::create(Animation::createWithSpriteFrames(coinFrames, 0.09f));
 }
-
-/*void HelloWorld::onMouseMoved(cocos2d::Event* event) {
-	if (_mouseJoint != NULL)
-		return;
-
-	EventMouse* mouseEvent = dynamic_cast<EventMouse*>(event);
-	mouseEvent->getMouseButton();
-	Point location = mouseEvent->getLocationInView();
-	location = CCDirector::getInstance()->convertToGL(location);
-	b2Vec2 locationWorld = b2Vec2(location.x / PTM_RATIO, location.y / PTM_RATIO);
-
-	if (_paddleFixture->TestPoint(locationWorld)) {
-		b2MouseJointDef md;
-		md.bodyA = _groundBody;
-		md.bodyB = _paddleBody;
-		md.target = locationWorld;
-		md.collideConnected = true;
-		md.maxForce = 1000.0f * _paddleBody->GetMass();
-
-		_mouseJoint = (b2MouseJoint *)_world->CreateJoint(&md);
-		_paddleBody->SetAwake(true);
-	}
-}*/
-
-/*
-void HelloWorld::onTouchesCancelled(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event *unused_event)
-{
-    if (_mouseJoint)
-    {
-        _world->DestroyJoint(_mouseJoint);
-        _mouseJoint = NULL;
-    }
-}
-
-void HelloWorld::onTouchesEnded(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event *unused_event)
-{
-    if (_mouseJoint)
-    {
-        _world->DestroyJoint(_mouseJoint);
-        _mouseJoint = NULL;
-    }
-}*/
