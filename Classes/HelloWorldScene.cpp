@@ -3,7 +3,7 @@
 using namespace cocos2d;
 using namespace CocosDenshion;
 
-#define PTM_RATIO 25
+#define PTM_RATIO 30
 
 HelloWorld::~HelloWorld()
 {
@@ -113,7 +113,7 @@ bool HelloWorld::init() {
     ballBody->ApplyLinearImpulse(force, ballBodyDef.position, true);
     
     paddle = Sprite::create("platform.png");
-    paddle->setPosition(winSize.width/2, 120);
+    paddle->setPosition(winSize.width/2, 100);
     this->addChild(paddle);
     
     // Create paddle body
@@ -159,40 +159,49 @@ bool HelloWorld::init() {
     _contactListener = new ContactListener();
     _world->SetContactListener(_contactListener);
     
-    for(int i = 0; i < 4; i++) {
-        
-        static int padding=20;
-        
-        // Create block and add it to the layer
-		this->coinAnimate = setCoinAnimation(4, "coin/%04d.png");
-        Sprite* block = Sprite::create("coin/0001.png");
-        int xOffset = padding+block->getContentSize().width/2+
-        ((block->getContentSize().width+padding)*i);
-        block->setPosition(xOffset, 250);
-        block->setTag(2);
-        this->addChild(block);
-		block->runAction(RepeatForever::create(this->coinAnimate));
-        
-        // Create block body
-        b2BodyDef blockBodyDef;
-        blockBodyDef.type = b2_dynamicBody;
-        blockBodyDef.position.Set(xOffset/PTM_RATIO, 250/PTM_RATIO);
-        blockBodyDef.userData = block;
-        b2Body *blockBody = _world->CreateBody(&blockBodyDef);
-        
-        // Create block shape
-        b2PolygonShape blockShape;
-        blockShape.SetAsBox(block->getContentSize().width/PTM_RATIO/2,
-                            block->getContentSize().height/PTM_RATIO/2);
-        
-        // Create shape definition and add to body
-        b2FixtureDef blockShapeDef;
-        blockShapeDef.shape = &blockShape;
-        blockShapeDef.density = 10.0;
-        blockShapeDef.friction = 0.0;
-        blockShapeDef.restitution = 0.1f;
-        blockBody->CreateFixture(&blockShapeDef);
-        
+	int counter = 0;
+	int yOffset = 330;
+	int xOffset = 0;
+
+	for(int i = 0; i < 5; i++) {
+		xOffset = 0;
+		for (int j = 0; j < 10; j++) {
+			static int padding = 20;
+
+			// Create block and add it to the layer
+			this->coinAnimate = setCoinAnimation(4, "coin/%04d.png");
+			Sprite* block = Sprite::create("coin/0001.png");
+			//int xOffset = padding+block->getContentSize().width/2+
+			//((block->getContentSize().width+padding)*i);
+			xOffset = xOffset + 30;
+
+			block->setPosition(xOffset, yOffset);
+			//block->setPosition(xOffset, 250);
+			block->setTag(2);
+			this->addChild(block);
+			block->runAction(RepeatForever::create(this->coinAnimate));
+
+			// Create block body
+			b2BodyDef blockBodyDef;
+			blockBodyDef.type = b2_dynamicBody;
+			blockBodyDef.position.Set(xOffset / PTM_RATIO, yOffset / PTM_RATIO);
+			blockBodyDef.userData = block;
+			b2Body *blockBody = _world->CreateBody(&blockBodyDef);
+
+			// Create block shape
+			b2PolygonShape blockShape;
+			blockShape.SetAsBox(block->getContentSize().width / PTM_RATIO / 2,
+				block->getContentSize().height / PTM_RATIO / 2);
+
+			// Create shape definition and add to body
+			b2FixtureDef blockShapeDef;
+			blockShapeDef.shape = &blockShape;
+			blockShapeDef.density = 10.0;
+			blockShapeDef.friction = 0.0;
+			blockShapeDef.restitution = 0.1f;
+			blockBody->CreateFixture(&blockShapeDef);
+		}
+		yOffset = yOffset - 30;
     }
     
     //SimpleAudioEngine::getInstance()->playBackgroundMusic("background-music-aac.caf");
