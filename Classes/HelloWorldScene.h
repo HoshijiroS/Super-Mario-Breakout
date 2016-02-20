@@ -2,6 +2,7 @@
 #define __HELLOWORLD_SCENE_H__
 
 #define COCOS2D_DEBUG 1
+#define ccsf(...) CCString::createWithFormat(__VA_ARGS__)->getCString()
 
 // When you import this file, you import all the cocos2d classes
 #include "cocos2d.h"
@@ -9,7 +10,6 @@
 #include "ContactListener.h"
 #include "GameOverScene.h"
 #include "SimpleAudioEngine.h"
-
 USING_NS_CC;
 
 class HelloWorld : public cocos2d::Layer {
@@ -27,6 +27,9 @@ public:
 	Animate* coinAnimate;
 	Animate* marioAnimate;
 	CREATE_FUNC(HelloWorld);
+
+	Label* labelScore;
+	int coins;
     
 private:
     b2World* _world;

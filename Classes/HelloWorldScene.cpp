@@ -24,6 +24,7 @@ Scene* HelloWorld::createScene()
 	scene->addChild(layer);
 
 	// return the scene
+
 	return scene;
 }
 
@@ -32,6 +33,10 @@ bool HelloWorld::init() {
 		return false;
 	}
     //setTouchEnabled( true );
+
+	//CocosDenshion::SimpleAudioEngine::sharedEngine()->playBackgroundMusic("bgm.wav", true);
+	SimpleAudioEngine::getInstance()->playBackgroundMusic("mario_bgm.wav", true);
+
 	auto listener = EventListenerKeyboard::create();
 	auto eventListener = EventListenerKeyboard::create();
 	
@@ -41,6 +46,19 @@ bool HelloWorld::init() {
     
 	Size winSize = CCDirector::getInstance()->getWinSize();
     
+	this->coins = 0;
+	TTFConfig label_config2;
+	label_config2.fontFilePath = "fonts/8-bit pusab.ttf";
+	label_config2.fontSize = 10;
+	label_config2.glyphs = GlyphCollection::DYNAMIC;
+	label_config2.customGlyphs = nullptr;
+	label_config2.distanceFieldEnabled = false;
+	label_config2.outlineSize = 0;
+	labelScore = Label::createWithTTF(label_config2, " 0");
+	labelScore->setColor(Color3B(255, 255, 255));
+	labelScore->setPosition(35, 440);
+	this->addChild(labelScore, 5);
+
 	// Define the gravity vector.
 	b2Vec2 gravity;
 	gravity.Set(0.0f, 0.0f);
@@ -131,8 +149,8 @@ bool HelloWorld::init() {
     b2FixtureDef paddleShapeDef;
     paddleShapeDef.shape = &paddleShape;
     paddleShapeDef.density = 10.0f;
-    paddleShapeDef.friction = 0.4f;
-    paddleShapeDef.restitution = 0.1f;
+    paddleShapeDef.friction = 0.0f;
+    paddleShapeDef.restitution = 1.0f;
     _paddleFixture = _paddleBody->CreateFixture(&paddleShapeDef);
     
     // Restrict paddle along the x axis
@@ -196,15 +214,13 @@ bool HelloWorld::init() {
 			b2FixtureDef blockShapeDef;
 			blockShapeDef.shape = &blockShape;
 			blockShapeDef.density = 10.0f;
-			blockShapeDef.friction = 0.4f;
-			blockShapeDef.restitution = 0.1f;
+			blockShapeDef.friction = 0.0f;
+			blockShapeDef.restitution = 1.0f;
 			//blockShapeDef.isSensor = true;
 			blockBody->CreateFixture(&blockShapeDef);
 		}
 		yOffset = yOffset - 25;
     }
-    
-    //SimpleAudioEngine::getInstance()->playBackgroundMusic("background-music-aac.caf");
     
 	this->schedule(schedule_selector(HelloWorld::tick));
 
@@ -269,8 +285,12 @@ void HelloWorld::tick(float dt)
         if ((contact.fixtureA == _bottomFixture && contact.fixtureB == _ballFixture) ||
             (contact.fixtureA == _ballFixture && contact.fixtureB == _bottomFixture)) {
             GameOverScene *gameOverScene = GameOverScene::create();
-            gameOverScene->getLayer()->getLabel()->setString("You Lose! :[");
-            CCDirector::getInstance()->replaceScene(gameOverScene);
+            gameOverScene->getLayer()->getLabel()->setString("GAME OVER!");
+			SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
+			SimpleAudioEngine::getInstance()->playEffect("smb_gameover.wav");
+			//CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("smb_gameover.wav");
+			CCDirector::getInstance()->replaceScene(gameOverScene);
+			//cocos2d::Director::getInstance()->pause();
         }
         
         b2Body *bodyA = contact.fixtureA->GetBody();
@@ -283,14 +303,22 @@ void HelloWorld::tick(float dt)
             if (spriteA->getTag() == 1 && spriteB->getTag() == 2) {
                 if (std::find(toDestroy.begin(), toDestroy.end(), bodyB)
                     == toDestroy.end()) {
+					SimpleAudioEngine::getInstance()->playEffect("smb_coin.wav");
+					//CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("smb_coin.wav");
                     toDestroy.push_back(bodyB);
+					coins++;
+					this->labelScore ->setString(ccsf(" %d", coins));
                 }
             }
             // Sprite B = block, Sprite A = ball
             else if (spriteA->getTag() == 2 && spriteB->getTag() == 1) {
                 if (std::find(toDestroy.begin(), toDestroy.end(), bodyA)
                     == toDestroy.end()) {
+					SimpleAudioEngine::getInstance()->playEffect("smb_coin.wav");
+					//CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("smb_coin.wav");
                     toDestroy.push_back(bodyA);
+					coins++;
+					this->labelScore->setString(ccsf(" %d", coins));
                 }
             }
         }
@@ -309,8 +337,12 @@ void HelloWorld::tick(float dt)
     if (!blockFound)
     {
         GameOverScene *gameOverScene = GameOverScene::create();
-        gameOverScene->getLayer()->getLabel()->setString("You Win!");
+        gameOverScene->getLayer()->getLabel()->setString("YOU WIN!");
+		SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
+		SimpleAudioEngine::getInstance()->playEffect("smb_world_clear.wav");
+		//CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("smb_world_clear.wav");
         Director::getInstance()->replaceScene(gameOverScene);
+		cocos2d::Director::getInstance()->pause();
     }
     
     if (toDestroy.size() > 0)

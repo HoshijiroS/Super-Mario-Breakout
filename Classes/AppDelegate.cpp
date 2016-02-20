@@ -45,7 +45,7 @@ void AppDelegate::initOpenGL()
 	auto glview = director->getOpenGLView();
 	if (!glview) {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_MAC) || (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX)
-		glview = GLViewImpl::createWithRect("Super Mario Rush!", Rect(0, 0, designResolutionSize.width, designResolutionSize.height));
+		glview = GLViewImpl::createWithRect("Super Mario Breakout!", Rect(0, 0, designResolutionSize.width, designResolutionSize.height));
 #else
 		glview = GLViewImpl::create("Code Rush!");
 #endif
@@ -57,7 +57,7 @@ void AppDelegate::initDirector()
 {
 	auto director = Director::getInstance();
 	director->setAnimationInterval(1.0 / 8);
-	director->setDisplayStats(true);
+	//director->setDisplayStats(true);
 }
 
 
