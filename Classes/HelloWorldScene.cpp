@@ -366,7 +366,11 @@ void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, cocos2d::Event* ev
 			locationWorld = b2Vec2(paddle->getPositionX() / PTM_RATIO - 1, paddle->getPositionY() / PTM_RATIO);
 			_mouseJoint->SetTarget(locationWorld);
 			break;
+		case EventKeyboard::KeyCode::KEY_R:
+			Director::getInstance()->replaceScene(HelloWorld::createScene());
+			break;
 		}
+
 }
 
 Animate* HelloWorld::setCoinAnimation(int j, char* filename) {
